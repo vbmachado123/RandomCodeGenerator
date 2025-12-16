@@ -5,13 +5,17 @@ public static class RobustCodeGenerator
 {
     static long counter = 0;
     const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const long Salt = 0x7E3779B97F4A7C15L;
+
 
     public static string Generate(int length)
     {
         long value = Interlocked.Increment(ref counter);
 
+        value ^= Salt;
+
         Span<char> buffer = stackalloc char[length];
-        for (int i = 7; i >= 0; i--)
+        for (int i = length - 1; i >= 0; i--)
         {
             buffer[i] = chars[(int)(value % 36)];
             value /= 36;
@@ -19,6 +23,24 @@ public static class RobustCodeGenerator
 
         return new string(buffer);
     }
+
+    //const long A = 6364136223846793005;
+    //const long C = 1442695040888963407;
+
+    //public static string Generate(int length)
+    //{
+    //    long value = Interlocked.Increment(ref counter);
+    //    value = unchecked(A * value + C);
+
+    //    Span<char> buffer = stackalloc char[length];
+    //    for (int i = length - 1; i >= 0; i--)
+    //    {
+    //        buffer[i] = chars[(int)(value % 36)];
+    //        value /= 36;
+    //    }
+
+    //    return new string(buffer);
+    //}
 }
 
 public class Program
